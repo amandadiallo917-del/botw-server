@@ -147,30 +147,7 @@ function loadDb() {
           usedByUser: null
         }
       ],
-      licenses: [
-        {
-          id: 'lic_demo_01',
-          username: 'conductor1',
-          passwordHash: hashPassword('123456'),
-          licenseKey: 'BOTW-VIP-2026',
-          status: 'active',
-          hwid: null,
-          deviceModel: null,
-          expiresAt: new Date(now + thirtyDaysMs).toISOString(),
-          createdAt: new Date(now).toISOString(),
-          lastLoginAt: null,
-          notes: 'Cuenta de prueba (30 dias)',
-          config: {
-            minFare: 15.0,
-            maxPickupKm: 3.0,
-            maxTripKm: 15.0,
-            minPricePerKm: 1.5,
-            autoAccept: true,
-            clickDelayMs: 350,
-            targetPackages: ['sinet.startup.inDriver']
-          }
-        }
-      ],
+      licenses: [],
       securityEvents: []
     };
     fs.writeFileSync(DB_FILE, JSON.stringify(initialDb, null, 2), 'utf8');
@@ -506,11 +483,43 @@ const server = http.createServer(async (req, res) => {
   if (req.method === 'GET' && pathname === '/api/v1/billing/info') {
     const hwid = String(parsedUrl.searchParams.get('hwid') || '').trim();
     const licenseKey = String(parsedUrl.searchParams.get('licenseKey') || '').trim();
-    const lic = db.licenses.find(
+    const deviceModel = String(parsedUrl.searchParams.get('model') || 'Android Device').trim();
+    let lic = db.licenses.find(
       (l) =>
         (hwid && l.hwid === hwid) ||
         (licenseKey && l.licenseKey.toUpperCase() === licenseKey.toUpperCase())
     );
+
+    // Si es un dispositivo nuevo con HWID valido que aun no esta registrado, registrarlo con 0 dias (SIN ACTIVAR)
+    // para que aparezca de inmediato en el Panel Admin listo para darle +7d / +15d / +30d
+    if (!lic && hwid && hwid.startsWith('AND-')) {
+      const shortHwid = hwid.replace(/[^a-zA-Z0-9]/g, '').slice(-6).toUpperCase();
+      const now = Date.now();
+      lic = {
+        id: 'lic_' + crypto.randomBytes(6).toString('hex'),
+        username: `chofer_${shortHwid.toLowerCase()}`,
+        passwordHash: hashPassword('123456'),
+        licenseKey: `BOTW-${shortHwid}`,
+        status: 'expired',
+        hwid,
+        deviceModel,
+        expiresAt: new Date(now - 24 * 60 * 60 * 1000).toISOString(),
+        createdAt: new Date(now).toISOString(),
+        lastLoginAt: new Date(now).toISOString(),
+        notes: 'Dispositivo nuevo (0 dias - Pendiente de pago)',
+        config: {
+          minFare: 15.0,
+          maxPickupKm: 3.0,
+          maxTripKm: 15.0,
+          minPricePerKm: 1.5,
+          autoAccept: true,
+          clickDelayMs: 350,
+          targetPackages: ['sinet.startup.inDriver']
+        }
+      };
+      db.licenses.unshift(lic);
+      saveDb(db);
+    }
 
     let licenseStatus = null;
     if (lic) {
@@ -716,7 +725,7 @@ const server = http.createServer(async (req, res) => {
         rechargePins: db.rechargePins || [],
         connectionUrls: {
           lanUrls: getLanUrls(PORT),
-          publicTunnelUrl: publicTunnelUrl || 'https://willmyphone.com/botw (o https://willmyphone.com)',
+          publicTunnelUrl: publicTunnelUrl || 'https://botw-server.onrender.com  (y  https://botw.willmyphone.com)',
           emulatorUrl: `http://10.0.2.2:${PORT}`
         },
         licenses: db.licenses.map(({ passwordHash, ...rest }) => rest),
