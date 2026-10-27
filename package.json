@@ -1,0 +1,12 @@
+{
+  "name": "botw-license-server",
+  "version": "5.189.0",
+  "description": "Servidor de Licencias, Pines y Firma RSA-2048 para BOTW (willmyphone.com)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "admin": {
+    "username": "admin",
+    "passwordHash": "042c41dc0a67fc6ce08462a3c08942a3622831506130f287eaa299cbe86b7502",
+    "tokenSecret": "21e2494bb0cf764a1e5ebd763899321501b446de8aebeaceff40e604bf92e065"
+  },
+  "branding": {
+    "schema": 1,
+    "distribution_id": "bd_2I_WQfBEWMqNmlIFdzUCIjbs",
+    "app_id": "botw5.189.0",
+    "flow_key": "srsaicos",
+    "validator_profile_key": "srsaicos",
+    "security_ui": "classic"
+  },
+  "licenses": [
+    {
+      "id": "lic_demo_01",
+      "username": "conductor1",
+      "passwordHash": "e4abaad53ed6914cc3256e87423803a3ddfc64c442e82494b568d8b03fcb5a89",
+      "licenseKey": "BOTW-VIP-2026",
+      "status": "active",
+      "hwid": "AND-6136054F6FC5",
+      "deviceModel": "TCL T509A",
+      "expiresAt": "2026-11-25T20:44:38.433Z",
+      "createdAt": "2026-10-26T20:44:38.433Z",
+      "lastLoginAt": "2026-10-26T21:54:51.624Z",
+      "notes": "Cuenta de prueba (30 dias)",
+      "config": {
+        "minFare": 15,
+        "maxPickupKm": 3,
+        "maxTripKm": 15,
+        "minPricePerKm": 1.5,
+        "autoAccept": true,
+        "clickDelayMs": 350,
+        "targetPackages": [
+          "sinet.startup.inDriver"
+        ]
+      }
+    }
+  ],
+  "securityEvents": []
+}
