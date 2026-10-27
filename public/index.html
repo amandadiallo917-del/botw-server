@@ -186,24 +186,25 @@
         <div class="card">
           <h2>💳 Configurar WhatsApp, Bancos y Precios (Opción 1)</h2>
           <label>Tu Número de WhatsApp (con código de país, ej. 18095551234)</label>
-          <input type="text" id="cfgWhatsapp" placeholder="18090000000" />
+          <input type="text" id="cfgWhatsapp" placeholder="18090000000" onchange="saveBillingConfig(true)" />
           <label>Cuentas Bancarias / Métodos de Pago (se muestran en la App)</label>
-          <input type="text" id="cfgBanks" placeholder="Banreservas: 960-... | Popular: 780-..." />
+          <input type="text" id="cfgBanks" placeholder="Banreservas: 960-... | Popular: 780-..." onchange="saveBillingConfig(true)" />
           <div class="row-2" style="grid-template-columns: 1fr 1fr 1fr; margin-top: 4px;">
             <div>
               <label>Plan 7 Días (RD$)</label>
-              <input type="number" id="cfgPrice7" value="500" />
+              <input type="number" id="cfgPrice7" value="500" onchange="saveBillingConfig(true)" />
             </div>
             <div>
               <label>Plan 15 Días (RD$)</label>
-              <input type="number" id="cfgPrice15" value="900" />
+              <input type="number" id="cfgPrice15" value="900" onchange="saveBillingConfig(true)" />
             </div>
             <div>
               <label>Plan 30 Días (RD$)</label>
-              <input type="number" id="cfgPrice30" value="1500" />
+              <input type="number" id="cfgPrice30" value="1500" onchange="saveBillingConfig(true)" />
             </div>
           </div>
-          <button class="btn btn-outline" style="width:100%; margin-top:14px; border-color:var(--accent); color:var(--accent);" onclick="saveBillingConfig()">Guardar Datos de Cobro</button>
+          <button id="saveBillingBtn" class="btn-primary" style="width:100%; margin-top:14px;" onclick="saveBillingConfig(false)">💾 Guardar Datos de Cobro</button>
+          <div id="billingSaveStatus" style="color:var(--ok); font-size:12px; margin-top:8px; text-align:center;"></div>
         </div>
 
         <div class="card">
@@ -374,17 +375,19 @@
         `;
       }).join('');
 
-      // Cargar configuración de cobros
+      // Cargar configuración de cobros (sin sobrescribir si el usuario está escribiendo en ese campo)
       if (data.billingConfig) {
-        document.getElementById('cfgWhatsapp').value = data.billingConfig.whatsappNumber || '';
-        document.getElementById('cfgBanks').value = data.billingConfig.bankAccounts || '';
+        const waEl = document.getElementById('cfgWhatsapp');
+        const bkEl = document.getElementById('cfgBanks');
+        if (document.activeElement !== waEl) waEl.value = data.billingConfig.whatsappNumber || '';
+        if (document.activeElement !== bkEl) bkEl.value = data.billingConfig.bankAccounts || '';
         const plans = data.billingConfig.plans || [];
         const p7 = plans.find(p => p.days === 7);
         const p15 = plans.find(p => p.days === 15);
         const p30 = plans.find(p => p.days === 30);
-        if (p7) document.getElementById('cfgPrice7').value = p7.price;
-        if (p15) document.getElementById('cfgPrice15').value = p15.price;
-        if (p30) document.getElementById('cfgPrice30').value = p30.price;
+        if (p7 && document.activeElement !== document.getElementById('cfgPrice7')) document.getElementById('cfgPrice7').value = p7.price;
+        if (p15 && document.activeElement !== document.getElementById('cfgPrice15')) document.getElementById('cfgPrice15').value = p15.price;
+        if (p30 && document.activeElement !== document.getElementById('cfgPrice30')) document.getElementById('cfgPrice30').value = p30.price;
       }
 
       // Cargar tabla de Pines de Recarga Prepagados
@@ -503,7 +506,9 @@
       alert('PIN copiado al portapapeles: ' + code);
     }
 
-    async function saveBillingConfig() {
+    async function saveBillingConfig(silent) {
+      const statusBox = document.getElementById('billingSaveStatus');
+      if (statusBox) statusBox.textContent = 'Guardando cambios...';
       const payload = {
         whatsappNumber: document.getElementById('cfgWhatsapp').value,
         bankAccounts: document.getElementById('cfgBanks').value,
@@ -519,10 +524,16 @@
         },
         body: JSON.stringify(payload)
       });
+      if (res.status === 401) return logout();
       const data = await res.json();
       if (data.ok) {
-        alert('✅ Datos de WhatsApp, Cuentas Bancarias y Precios guardados correctamente.');
+        if (statusBox) statusBox.textContent = '✅ Guardado en el servidor (' + new Date().toLocaleTimeString() + ')';
+        if (!silent) {
+          alert('✅ Datos de WhatsApp, Cuentas Bancarias y Precios guardados correctamente.');
+        }
         await loadOverview();
+      } else {
+        if (statusBox) statusBox.textContent = '❌ Error al guardar';
       }
     }
 

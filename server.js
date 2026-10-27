@@ -736,8 +736,14 @@ const server = http.createServer(async (req, res) => {
     if (req.method === 'POST' && pathname === '/api/v1/admin/billing-config') {
       const body = await parseBody(req);
       db.billingConfig = {
-        whatsappNumber: String(body.whatsappNumber || db.billingConfig.whatsappNumber || '').replace(/[^0-9]/g, ''),
-        bankAccounts: String(body.bankAccounts || db.billingConfig.bankAccounts || '').trim(),
+        whatsappNumber:
+          body.whatsappNumber !== undefined
+            ? String(body.whatsappNumber).replace(/[^0-9]/g, '')
+            : db.billingConfig.whatsappNumber,
+        bankAccounts:
+          body.bankAccounts !== undefined
+            ? String(body.bankAccounts).trim()
+            : db.billingConfig.bankAccounts,
         currency: String(body.currency || 'RD$').trim(),
         plans: [
           {
