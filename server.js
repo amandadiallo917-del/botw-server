@@ -125,8 +125,8 @@ function loadDb() {
         security_ui: 'classic'
       },
       billingConfig: {
-        whatsappNumber: '18090000000',
-        bankAccounts: 'Banreservas: 960-000000-0 | Banco Popular: 780-000000-0 (A nombre de: Admin BOTW)',
+        whatsappNumber: '18092355519',
+        bankAccounts: 'Banreservas: 9608414920 | Banco Popular: 821386158',
         currency: 'RD$',
         plans: [
           { id: 'plan_7d', name: 'Plan Semanal', days: 7, price: 500 },
@@ -157,8 +157,8 @@ function loadDb() {
   let migrated = false;
   if (!existingDb.billingConfig) {
     existingDb.billingConfig = {
-      whatsappNumber: '18090000000',
-      bankAccounts: 'Banreservas: 960-000000-0 | Banco Popular: 780-000000-0 (A nombre de: Admin BOTW)',
+      whatsappNumber: '18092355519',
+      bankAccounts: 'Banreservas: 9608414920 | Banco Popular: 821386158',
       currency: 'RD$',
       plans: [
         { id: 'plan_7d', name: 'Plan Semanal', days: 7, price: 500 },

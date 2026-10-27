@@ -12,6 +12,16 @@
     "validator_profile_key": "srsaicos",
     "security_ui": "classic"
   },
+  "billingConfig": {
+    "whatsappNumber": "18092355519",
+    "bankAccounts": "Banreservas: 9608414920 | Banco Popular: 821386158",
+    "currency": "RD$",
+    "plans": [
+      { "id": "plan_7d", "name": "Plan Semanal", "days": 7, "price": 500 },
+      { "id": "plan_15d", "name": "Plan Quincenal", "days": 15, "price": 900 },
+      { "id": "plan_30d", "name": "Plan Mensual VIP", "days": 30, "price": 1500 }
+    ]
+  },
   "licenses": [],
   "securityEvents": []
 }
